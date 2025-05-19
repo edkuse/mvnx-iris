@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Epics{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-lg leading-6 font-medium text-gray-900">{% block epics_title %}Epics{% endblock %}</h1>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">{% block epics_subtitle %}Manage and track epics{% endblock %}</p>
+        </div>
+        {% block epics_actions %}{% endblock %}
+    </div>
+    <div class="border-t border-gray-200">
+        {% block epics_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

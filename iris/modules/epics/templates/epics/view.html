@@ -1,0 +1,294 @@
+{% extends "epics/layout.html" %}
+
+{% block epics_title %}{{ epic.title }}{% endblock %}
+{% block epics_subtitle %}
+    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+        {% if epic.status == 'draft' %}bg-gray-100 text-gray-800
+        {% elif epic.status == 'planned' %}bg-blue-100 text-blue-800
+        {% elif epic.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+        {% elif epic.status == 'completed' %}bg-green-100 text-green-800
+        {% elif epic.status == 'cancelled' %}bg-red-100 text-red-800
+        {% endif %}">
+        {{ epic.status.replace('_', ' ').title() }}
+    </span>
+{% endblock %}
+
+{% block epics_actions %}
+<div class="flex space-x-2">
+    <a href="{{ url_for('epics.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Epics
+    </a>
+    
+    <a href="{{ url_for('epics.edit', id=epic.id) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Edit
+    </a>
+    
+    <button type="button" onclick="document.getElementById('delete-modal').classList.remove('hidden')" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        Delete
+    </button>
+</div>
+{% endblock %}
+
+{% block epics_content %}
+<div class="bg-white shadow overflow-hidden">
+    <div class="px-4 py-5 sm:px-6">
+        <div class="flex flex-wrap gap-2 mb-4">
+            <!-- Priority Badge -->
+            <div class="flex items-center text-sm text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-5 w-5 
+                    {% if epic.priority == 'low' %}text-gray-400
+                    {% elif epic.priority == 'medium' %}text-blue-500
+                    {% elif epic.priority == 'high' %}text-orange-500
+                    {% elif epic.priority == 'critical' %}text-red-500
+                    {% endif %}" 
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Priority: {{ epic.priority.title() }}
+            </div>
+            
+            <!-- Completion Percentage -->
+            <div class="flex items-center text-sm text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Completion: {{ epic.completion_percentage }}%
+            </div>
+            
+            <!-- Estimated Effort -->
+            {% if epic.estimated_effort %}
+            <div class="flex items-center text-sm text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Effort: {{ epic.estimated_effort }} hours
+            </div>
+            {% endif %}
+            
+            <!-- Date Range -->
+            <div class="flex items-center text-sm text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {% if epic.start_date and epic.target_date %}
+                {{ epic.start_date.strftime('%b %d, %Y') }} - {{ epic.target_date.strftime('%b %d, %Y') }}
+                {% elif epic.start_date %}
+                Starts: {{ epic.start_date.strftime('%b %d, %Y') }}
+                {% elif epic.target_date %}
+                Target: {{ epic.target_date.strftime('%b %d, %Y') }}
+                {% else %}
+                No dates set
+                {% endif %}
+                
+                {% if epic.days_until_target is not none and epic.target_date %}
+                    {% if epic.days_until_target > 0 %}
+                    <span class="ml-1 text-xs text-green-600">(in {{ epic.days_until_target }} days)</span>
+                    {% elif epic.days_until_target == 0 %}
+                    <span class="ml-1 text-xs text-yellow-600">(today)</span>
+                    {% else %}
+                    <span class="ml-1 text-xs text-red-600">({{ abs(epic.days_until_target) }} days ago)</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Tags -->
+        <div class="mt-2">
+            {% for tag in epic.tags %}
+            <a href="{{ url_for('epics.index', tag=tag) }}" class="mr-1 mb-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200">
+                {{ tag }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+            <!-- Description -->
+            <div class="sm:col-span-2">
+                <dt class="text-sm font-medium text-gray-500">Description</dt>
+                <dd class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{ epic.description or 'No description provided.' }}</dd>
+            </div>
+            
+            <!-- Business Value -->
+            <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Business Value</dt>
+                <dd class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{ epic.business_value or 'Not specified.' }}</dd>
+            </div>
+            
+            <!-- Acceptance Criteria -->
+            <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Acceptance Criteria</dt>
+                <dd class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{ epic.acceptance_criteria or 'Not specified.' }}</dd>
+            </div>
+            
+            <!-- Created By -->
+            <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Created By</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                    {% if epic.created_by %}
+                    <div class="flex items-center">
+                        <img class="h-8 w-8 rounded-full mr-2" src="{{ url_for('auth.profile_photo', user_id=epic.created_by.id) }}" alt="{{ epic.created_by.display_name }}">
+                        <span>{{ epic.created_by.display_name }}</span>
+                    </div>
+                    {% else %}
+                    Unknown
+                    {% endif %}
+                </dd>
+            </div>
+            
+            <!-- Assigned To -->
+            <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Assigned To</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                    {% if epic.assigned_to %}
+                    <div class="flex items-center">
+                        <img class="h-8 w-8 rounded-full mr-2" src="{{ url_for('auth.profile_photo', user_id=epic.assigned_to.id) }}" alt="{{ epic.assigned_to.display_name }}">
+                        <span>{{ epic.assigned_to.display_name }}</span>
+                    </div>
+                    {% else %}
+                    Not assigned
+                    {% endif %}
+                </dd>
+            </div>
+            
+            <!-- Created At -->
+            <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Created</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ epic.created_at.strftime('%b %d, %Y at %H:%M') }}</dd>
+            </div>
+            
+            <!-- Updated At -->
+            <div class="sm:col-span-1">
+                <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ epic.updated_at.strftime('%b %d, %Y at %H:%M') }}</dd>
+            </div>
+        </dl>
+    </div>
+    
+    <!-- User Stories Section -->
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">User Stories</h3>
+            <a href="{{ url_for('user_stories.create', epic_id=epic.id) }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Add User Story
+            </a>
+        </div>
+        
+        {% if epic.user_stories %}
+        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+            <table class="min-w-full divide-y divide-gray-300">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Title</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Assigned To</th>
+                        <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Points</th>
+                        <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                            <span class="sr-only">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    {% for story in epic.user_stories %}
+                    <tr>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-indigo-600 sm:pl-6">
+                            <a href="{{ url_for('user_stories.view', id=story.id) }}">{{ story.title }}</a>
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if story.status == 'backlog' %}bg-gray-100 text-gray-800
+                                {% elif story.status == 'ready' %}bg-blue-100 text-blue-800
+                                {% elif story.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                                {% elif story.status == 'in_review' %}bg-purple-100 text-purple-800
+                                {% elif story.status == 'completed' %}bg-green-100 text-green-800
+                                {% elif story.status == 'cancelled' %}bg-red-100 text-red-800
+                                {% endif %}">
+                                {{ story.status.replace('_', ' ').title() }}
+                            </span>
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {% if story.assigned_to %}
+                            {{ story.assigned_to.display_name }}
+                            {% else %}
+                            Not assigned
+                            {% endif %}
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {{ story.story_points or '-' }}
+                        </td>
+                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                            <a href="{{ url_for('user_stories.edit', id=story.id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                            <a href="{{ url_for('user_stories.view', id=story.id) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-6 bg-gray-50 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No user stories</h3>
+            <p class="mt-1 text-sm text-gray-500">Get started by creating a new user story for this epic.</p>
+            <div class="mt-6">
+                <a href="{{ url_for('user_stories.create', epic_id=epic.id) }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add User Story
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Delete Epic</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">Are you sure you want to delete this epic? All associated user stories will also be deleted. This action cannot be undone.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <form method="post" action="{{ url_for('epics.delete', id=epic.id) }}">
+                    {{ csrf_token() }}
+                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Delete</button>
+                </form>
+                <button type="button" onclick="document.getElementById('delete-modal').classList.add('hidden')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

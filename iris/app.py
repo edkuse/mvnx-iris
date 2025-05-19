@@ -21,6 +21,9 @@ def create_app(config_class=Config):
     from iris.modules.dashboard import bp as dashboard_bp
     app.register_blueprint(dashboard_bp)
 
+    from iris.modules.epics import bp as epics_bp
+    app.register_blueprint(epics_bp)
+
     from iris.modules.product_ideas import bp as product_ideas_bp
     app.register_blueprint(product_ideas_bp)
     

@@ -1,0 +1,173 @@
+{% extends "epics/layout.html" %}
+
+{% block epics_title %}Epics{% endblock %}
+{% block epics_subtitle %}Browse and filter epics{% endblock %}
+
+{% block epics_actions %}
+<div>
+    <a href="{{ url_for('epics.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        New Epic
+    </a>
+</div>
+{% endblock %}
+
+{% block epics_content %}
+<!-- Filters -->
+<div class="bg-gray-50 p-4 border-b border-gray-200">
+    <form method="get" action="{{ url_for('epics.index') }}" class="space-y-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            <!-- Status Filter -->
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <select id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="">All Statuses</option>
+                    {% for status in statuses %}
+                    <option value="{{ status }}" {% if current_filters.status == status %}selected{% endif %}>
+                        {{ status.replace('_', ' ').title() }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Priority Filter -->
+            <div>
+                <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
+                <select id="priority" name="priority" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="">All Priorities</option>
+                    {% for priority in priorities %}
+                    <option value="{{ priority }}" {% if current_filters.priority == priority %}selected{% endif %}>
+                        {{ priority.replace('_', ' ').title() }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Tag Filter -->
+            <div>
+                <label for="tag" class="block text-sm font-medium text-gray-700">Tag</label>
+                <select id="tag" name="tag" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option value="">All Tags</option>
+                    {% for tag in all_tags %}
+                    <option value="{{ tag }}" {% if current_filters.tag == tag %}selected{% endif %}>
+                        {{ tag }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="flex justify-end">
+            <a href="{{ url_for('epics.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2">
+                Clear Filters
+            </a>
+            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Apply Filters
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Epics List -->
+<div class="bg-white">
+    {% if epics %}
+    <ul class="divide-y divide-gray-200">
+        {% for epic in epics %}
+        <li class="px-4 py-4 sm:px-6 hover:bg-gray-50">
+            <div class="flex items-center justify-between">
+                <a href="{{ url_for('epics.view', id=epic.id) }}" class="block focus:outline-none">
+                    <p class="text-sm font-medium text-indigo-600 truncate">{{ epic.title }}</p>
+                    <p class="mt-1 text-sm text-gray-500 line-clamp-2">{{ epic.description|truncate(150) }}</p>
+                </a>
+                <div class="ml-2 flex-shrink-0 flex">
+                    <!-- Status Badge -->
+                    <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        {% if epic.status == 'draft' %}bg-gray-100 text-gray-800
+                        {% elif epic.status == 'planned' %}bg-blue-100 text-blue-800
+                        {% elif epic.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                        {% elif epic.status == 'completed' %}bg-green-100 text-green-800
+                        {% elif epic.status == 'cancelled' %}bg-red-100 text-red-800
+                        {% endif %}">
+                        {{ epic.status.replace('_', ' ').title() }}
+                    </p>
+                </div>
+            </div>
+            <div class="mt-2 sm:flex sm:justify-between">
+                <div class="sm:flex">
+                    <!-- Priority Badge -->
+                    <p class="flex items-center text-xs text-gray-500 mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-4 w-4 
+                            {% if epic.priority == 'low' %}text-gray-400
+                            {% elif epic.priority == 'medium' %}text-blue-500
+                            {% elif epic.priority == 'high' %}text-orange-500
+                            {% elif epic.priority == 'critical' %}text-red-500
+                            {% endif %}" 
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        {{ epic.priority.title() }}
+                    </p>
+                    
+                    <!-- Completion Percentage -->
+                    <p class="flex items-center text-xs text-gray-500 mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {{ epic.completion_percentage }}% Complete
+                    </p>
+                    
+                    <!-- Tags -->
+                    <div class="mt-2 flex flex-wrap sm:mt-0">
+                        {% for tag in epic.tags %}
+                        <span class="mr-1 mb-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                            {{ tag }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="mt-2 flex items-center text-xs text-gray-500 sm:mt-0">
+                    <!-- Created By -->
+                    {% if epic.created_by %}
+                    <p class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        {{ epic.created_by.display_name }}
+                    </p>
+                    {% endif %}
+                    
+                    <!-- Target Date -->
+                    {% if epic.target_date %}
+                    <p class="ml-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {{ epic.target_date.strftime('%b %d, %Y') }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="text-center py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No epics</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by creating a new epic.</p>
+        <div class="mt-6">
+            <a href="{{ url_for('epics.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                New Epic
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
