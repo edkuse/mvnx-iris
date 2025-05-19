@@ -25,8 +25,8 @@
                 <select id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                     <option value="">All Statuses</option>
                     {% for status in statuses %}
-                    <option value="{{ status.name.lower() }}" {% if current_filters.status == status.name.lower() %}selected{% endif %}>
-                        {{ status.value.replace('_', ' ').title() }}
+                    <option value="{{ status.lower() }}" {% if current_filters.status == status.lower() %}selected{% endif %}>
+                        {{ status.replace('_', ' ').title() }}
                     </option>
                     {% endfor %}
                 </select>
@@ -38,8 +38,8 @@
                 <select id="priority" name="priority" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                     <option value="">All Priorities</option>
                     {% for priority in priorities %}
-                    <option value="{{ priority.name.lower() }}" {% if current_filters.priority == priority.name.lower() %}selected{% endif %}>
-                        {{ priority.value.title() }}
+                    <option value="{{ priority.lower() }}" {% if current_filters.priority == priority.lower() %}selected{% endif %}>
+                        {{ priority.title() }}
                     </option>
                     {% endfor %}
                 </select>
@@ -51,8 +51,8 @@
                 <select id="impact" name="impact" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                     <option value="">All Impact Levels</option>
                     {% for impact in impacts %}
-                    <option value="{{ impact.name.lower() }}" {% if current_filters.impact == impact.name.lower() %}selected{% endif %}>
-                        {{ impact.value.title() }}
+                    <option value="{{ impact.lower() }}" {% if current_filters.impact == impact.lower() %}selected{% endif %}>
+                        {{ impact.title() }}
                     </option>
                     {% endfor %}
                 </select>
@@ -97,14 +97,14 @@
                 <div class="ml-2 flex-shrink-0 flex">
                     <!-- Status Badge -->
                     <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        {% if idea.status.value == 'draft' %}bg-gray-100 text-gray-800
-                        {% elif idea.status.value == 'submitted' %}bg-blue-100 text-blue-800
-                        {% elif idea.status.value == 'under_review' %}bg-yellow-100 text-yellow-800
-                        {% elif idea.status.value == 'approved' %}bg-green-100 text-green-800
-                        {% elif idea.status.value == 'rejected' %}bg-red-100 text-red-800
-                        {% elif idea.status.value == 'implemented' %}bg-purple-100 text-purple-800
+                        {% if idea.status == 'draft' %}bg-gray-100 text-gray-800
+                        {% elif idea.status == 'submitted' %}bg-blue-100 text-blue-800
+                        {% elif idea.status == 'under_review' %}bg-yellow-100 text-yellow-800
+                        {% elif idea.status == 'approved' %}bg-green-100 text-green-800
+                        {% elif idea.status == 'rejected' %}bg-red-100 text-red-800
+                        {% elif idea.status == 'implemented' %}bg-purple-100 text-purple-800
                         {% endif %}">
-                        {{ idea.status.value.replace('_', ' ').title() }}
+                        {{ idea.status.replace('_', ' ').title() }}
                     </p>
                 </div>
             </div>
@@ -113,29 +113,29 @@
                     <!-- Priority Badge -->
                     <p class="flex items-center text-xs text-gray-500 mr-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-4 w-4 
-                            {% if idea.priority.value == 'low' %}text-gray-400
-                            {% elif idea.priority.value == 'medium' %}text-blue-500
-                            {% elif idea.priority.value == 'high' %}text-orange-500
-                            {% elif idea.priority.value == 'critical' %}text-red-500
+                            {% if idea.priority == 'low' %}text-gray-400
+                            {% elif idea.priority == 'medium' %}text-blue-500
+                            {% elif idea.priority == 'high' %}text-orange-500
+                            {% elif idea.priority == 'critical' %}text-red-500
                             {% endif %}" 
                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
-                        {{ idea.priority.value.title() }}
+                        {{ idea.priority.title() }}
                     </p>
                     
                     <!-- Impact Badge -->
                     <p class="flex items-center text-xs text-gray-500 mr-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-4 w-4 
-                            {% if idea.impact_level.value == 'minimal' %}text-gray-400
-                            {% elif idea.impact_level.value == 'moderate' %}text-blue-500
-                            {% elif idea.impact_level.value == 'significant' %}text-purple-500
-                            {% elif idea.impact_level.value == 'transformative' %}text-indigo-500
+                            {% if idea.impact_level == 'minimal' %}text-gray-400
+                            {% elif idea.impact_level == 'moderate' %}text-blue-500
+                            {% elif idea.impact_level == 'significant' %}text-purple-500
+                            {% elif idea.impact_level == 'transformative' %}text-indigo-500
                             {% endif %}" 
                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                         </svg>
-                        {{ idea.impact_level.value.title() }}
+                        {{ idea.impact_level.title() }}
                     </p>
                     
                     <!-- Tags -->

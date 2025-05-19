@@ -25,22 +25,19 @@ def index():
     # Apply filters
     if status:
         try:
-            status_enum = ProductIdeaStatus[status.upper()]
-            query = query.filter(ProductIdea.status == status_enum)
+            query = query.filter(ProductIdea.status == status)
         except KeyError:
             pass
     
     if priority:
         try:
-            priority_enum = PriorityLevel[priority.upper()]
-            query = query.filter(ProductIdea.priority == priority_enum)
+            query = query.filter(ProductIdea.priority == priority)
         except KeyError:
             pass
     
     if impact:
         try:
-            impact_enum = ImpactLevel[impact.upper()]
-            query = query.filter(ProductIdea.impact_level == impact_enum)
+            query = query.filter(ProductIdea.impact_level == impact)
         except KeyError:
             pass
     
@@ -57,9 +54,9 @@ def index():
     return render_template(
         'product_ideas/index.html',
         ideas=ideas,
-        statuses=ProductIdeaStatus,
-        priorities=PriorityLevel,
-        impacts=ImpactLevel,
+        statuses=ProductIdeaStatus.values(),
+        priorities=PriorityLevel.values(),
+        impacts=ImpactLevel.values(),
         all_tags=all_tags,
         current_filters={
             'status': status,
@@ -95,19 +92,19 @@ def create():
         
         # Convert enums
         try:
-            status = ProductIdeaStatus[status_name]
+            status = getattr(ProductIdeaStatus, status_name.upper())
         except KeyError:
             status = ProductIdeaStatus.DRAFT
             form_errors['status'] = f'Invalid status: {status_name}'
         
         try:
-            priority = PriorityLevel[priority_name]
+            priority = getattr(PriorityLevel, priority_name.upper())
         except KeyError:
-            priority = PriorityLevel.MEDIUM
+            priority = PriorityLevel.LOW
             form_errors['priority'] = f'Invalid priority: {priority_name}'
         
         try:
-            impact_level = ImpactLevel[impact_name]
+            impact_level = getattr(ImpactLevel, impact_name.upper())
         except KeyError:
             impact_level = ImpactLevel.MODERATE
             form_errors['impact_level'] = f'Invalid impact level: {impact_name}'
@@ -146,9 +143,9 @@ def create():
             return render_template(
                 'product_ideas/form.html',
                 idea=None,
-                statuses=ProductIdeaStatus,
-                priorities=PriorityLevel,
-                impacts=ImpactLevel,
+                statuses=ProductIdeaStatus.values(),
+                priorities=PriorityLevel.values(),
+                impacts=ImpactLevel.values(),
                 users=users,
                 form_errors=form_errors
             )
@@ -183,12 +180,13 @@ def create():
     return render_template(
         'product_ideas/form.html',
         idea=None,
-        statuses=ProductIdeaStatus,
-        priorities=PriorityLevel,
-        impacts=ImpactLevel,
+        statuses=ProductIdeaStatus.values(),
+        priorities=PriorityLevel.values(),
+        impacts=ImpactLevel.values(),
         users=users,
         form_errors={}
     )
+
 
 @bp.route('/<int:id>')
 @login_required
@@ -196,6 +194,7 @@ def view(id):
     """View a product idea."""
     idea = ProductIdea.query.get_or_404(id)
     return render_template('product_ideas/view.html', idea=idea)
+
 
 @bp.route('/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -225,19 +224,19 @@ def edit(id):
         
         # Convert enums
         try:
-            status = ProductIdeaStatus[status_name]
+            status = getattr(ProductIdeaStatus, status_name.upper())
         except KeyError:
             status = ProductIdeaStatus.DRAFT
             form_errors['status'] = f'Invalid status: {status_name}'
         
         try:
-            priority = PriorityLevel[priority_name]
+            priority = getattr(PriorityLevel, priority_name.upper())
         except KeyError:
             priority = PriorityLevel.MEDIUM
             form_errors['priority'] = f'Invalid priority: {priority_name}'
         
         try:
-            impact_level = ImpactLevel[impact_name]
+            impact_level = getattr(ImpactLevel, impact_name.upper())
         except KeyError:
             impact_level = ImpactLevel.MODERATE
             form_errors['impact_level'] = f'Invalid impact level: {impact_name}'
@@ -276,9 +275,9 @@ def edit(id):
             return render_template(
                 'product_ideas/form.html',
                 idea=idea,
-                statuses=ProductIdeaStatus,
-                priorities=PriorityLevel,
-                impacts=ImpactLevel,
+                statuses=ProductIdeaStatus.values(),
+                priorities=PriorityLevel.values(),
+                impacts=ImpactLevel.values(),
                 users=users,
                 form_errors=form_errors
             )
@@ -307,12 +306,13 @@ def edit(id):
     return render_template(
         'product_ideas/form.html',
         idea=idea,
-        statuses=ProductIdeaStatus,
-        priorities=PriorityLevel,
-        impacts=ImpactLevel,
+        statuses=ProductIdeaStatus.values(),
+        priorities=PriorityLevel.values(),
+        impacts=ImpactLevel.values(),
         users=users,
         form_errors={}
     )
+
 
 @bp.route('/<int:id>/delete', methods=['POST'])
 @login_required
@@ -325,6 +325,7 @@ def delete(id):
     
     flash_success('Product idea deleted successfully!')
     return redirect(url_for('product_ideas.index'))
+
 
 @bp.route('/api/tags')
 @login_required

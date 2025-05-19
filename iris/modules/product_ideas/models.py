@@ -1,56 +1,83 @@
 from iris.extensions import db
 from datetime import datetime
-import enum
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy import Enum, Text
+from sqlalchemy import Text, CheckConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
-# Define enums for status, priority, and impact level
-class ProductIdeaStatus(enum.Enum):
+# Define constants for status, priority, and impact level
+class ProductIdeaStatus:
     DRAFT = "draft"
     SUBMITTED = "submitted"
     UNDER_REVIEW = "under_review"
     APPROVED = "approved"
     REJECTED = "rejected"
     IMPLEMENTED = "implemented"
+    
+    @classmethod
+    def values(cls):
+        return [cls.DRAFT, cls.SUBMITTED, cls.UNDER_REVIEW, cls.APPROVED, cls.REJECTED, cls.IMPLEMENTED]
 
-class PriorityLevel(enum.Enum):
+
+class PriorityLevel:
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
+    
+    @classmethod
+    def values(cls):
+        return [cls.LOW, cls.MEDIUM, cls.HIGH, cls.CRITICAL]
 
-class ImpactLevel(enum.Enum):
+
+class ImpactLevel:
     MINIMAL = "minimal"      # Affects a small number of users or has minor improvements
     MODERATE = "moderate"    # Affects a significant user segment or provides notable improvements
     SIGNIFICANT = "significant"  # Affects most users or provides major improvements
     TRANSFORMATIVE = "transformative"  # Game-changing feature that transforms the product experience
+    
+    @classmethod
+    def values(cls):
+        return [cls.MINIMAL, cls.MODERATE, cls.SIGNIFICANT, cls.TRANSFORMATIVE]
 
 
 class ProductIdea(db.Model):
     __tablename__ = 'product_ideas'
-    
+    __table_args__ = (
+        CheckConstraint(
+            f"status IN ({','.join([f"'{v}'" for v in ProductIdeaStatus.values()])})",
+            name='check_status_values'
+        ),
+        CheckConstraint(
+            f"priority IN ({','.join([f"'{v}'" for v in PriorityLevel.values()])})",
+            name='check_priority_values'
+        ),
+        CheckConstraint(
+            f"impact_level IN ({','.join([f"'{v}'" for v in ImpactLevel.values()])})",
+            name='check_impact_values'
+        ),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
     
-    # Status and priority as enums
+    # Status and priority as strings with check constraints
     status = db.Column(
-        Enum(ProductIdeaStatus),
+        db.String(20),
         default=ProductIdeaStatus.DRAFT,
         nullable=False
     )
     
     priority = db.Column(
-        Enum(PriorityLevel),
+        db.String(20),
         default=PriorityLevel.LOW,
         nullable=False
     )
     
-    # Impact level as enum
+    # Impact level as string with check constraint
     impact_level = db.Column(
-        Enum(ImpactLevel),
+        db.String(20),
         default=ImpactLevel.MODERATE,
         nullable=False
     )
@@ -72,8 +99,7 @@ class ProductIdea(db.Model):
     technical_feasibility = db.Column(db.Text)
     estimated_effort = db.Column(db.Integer)  # In hours or story points
     
-    # Tags - handle differently based on database
-    # For PostgreSQL
+    # Tags
     tags = db.Column(ARRAY(Text))
     
     # Hybrid properties
@@ -141,9 +167,9 @@ class ProductIdea(db.Model):
             'id': self.id,
             'title': self.title,
             'description': self.description,
-            'status': self.status.value if self.status else None,
-            'priority': self.priority.value if self.priority else None,
-            'impact_level': self.impact_level.value if self.impact_level else None,
+            'status': self.status,
+            'priority': self.priority,
+            'impact_level': self.impact_level,
             'created_by': {
                 'id': self.created_by.id,
                 'name': self.created_by.display_name

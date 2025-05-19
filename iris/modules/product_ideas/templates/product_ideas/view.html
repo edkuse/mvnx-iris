@@ -3,14 +3,14 @@
 {% block product_ideas_title %}{{ idea.title }}{% endblock %}
 {% block product_ideas_subtitle %}
     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-        {% if idea.status.value == 'draft' %}bg-gray-100 text-gray-800
-        {% elif idea.status.value == 'submitted' %}bg-blue-100 text-blue-800
-        {% elif idea.status.value == 'under_review' %}bg-yellow-100 text-yellow-800
-        {% elif idea.status.value == 'approved' %}bg-green-100 text-green-800
-        {% elif idea.status.value == 'rejected' %}bg-red-100 text-red-800
-        {% elif idea.status.value == 'implemented' %}bg-purple-100 text-purple-800
+        {% if idea.status == 'draft' %}bg-gray-100 text-gray-800
+        {% elif idea.status == 'submitted' %}bg-blue-100 text-blue-800
+        {% elif idea.status == 'under_review' %}bg-yellow-100 text-yellow-800
+        {% elif idea.status == 'approved' %}bg-green-100 text-green-800
+        {% elif idea.status == 'rejected' %}bg-red-100 text-red-800
+        {% elif idea.status == 'implemented' %}bg-purple-100 text-purple-800
         {% endif %}">
-        {{ idea.status.value.replace('_', ' ').title() }}
+        {{ idea.status.replace('_', ' ').title() }}
     </span>
 {% endblock %}
 
@@ -46,29 +46,29 @@
             <!-- Priority Badge -->
             <div class="flex items-center text-sm text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-5 w-5 
-                    {% if idea.priority.value == 'low' %}text-gray-400
-                    {% elif idea.priority.value == 'medium' %}text-blue-500
-                    {% elif idea.priority.value == 'high' %}text-orange-500
-                    {% elif idea.priority.value == 'critical' %}text-red-500
+                    {% if idea.priority == 'low' %}text-gray-400
+                    {% elif idea.priority == 'medium' %}text-blue-500
+                    {% elif idea.priority == 'high' %}text-orange-500
+                    {% elif idea.priority == 'critical' %}text-red-500
                     {% endif %}" 
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                Priority: {{ idea.priority.value.title() }}
+                Priority: {{ idea.priority.title() }}
             </div>
             
             <!-- Impact Badge -->
             <div class="flex items-center text-sm text-gray-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 mr-1.5 h-5 w-5 
-                    {% if idea.impact_level.value == 'minimal' %}text-gray-400
-                    {% elif idea.impact_level.value == 'moderate' %}text-blue-500
-                    {% elif idea.impact_level.value == 'significant' %}text-purple-500
-                    {% elif idea.impact_level.value == 'transformative' %}text-indigo-500
+                    {% if idea.impact_level == 'minimal' %}text-gray-400
+                    {% elif idea.impact_level == 'moderate' %}text-blue-500
+                    {% elif idea.impact_level == 'significant' %}text-purple-500
+                    {% elif idea.impact_level == 'transformative' %}text-indigo-500
                     {% endif %}" 
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
-                Impact: {{ idea.impact_level.value.title() }}
+                Impact: {{ idea.impact_level.title() }}
             </div>
             
             <!-- Value Score -->
@@ -209,7 +209,6 @@
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <form method="post" action="{{ url_for('product_ideas.delete', id=idea.id) }}">
-                    {{ csrf_token() }}
                     <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Delete</button>
                 </form>
                 <button type="button" onclick="document.getElementById('delete-modal').classList.add('hidden')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>

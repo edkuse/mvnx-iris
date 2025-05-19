@@ -6,6 +6,46 @@
     <title>{% block title %}MVNx Iris{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.10.5/dist/cdn.min.js" defer></script>
+    <style>
+        /* Flash message animations */
+        @keyframes slideInDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .flash-message {
+            animation: slideInDown 0.3s ease-out forwards;
+            position: relative;
+        }
+        
+        .flash-message.fade-out {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
     {% block styles %}{% endblock %}
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -13,24 +53,62 @@
     
     <div class="flex flex-1">
         {% include 'components/sidebar.html' %}
-        
-        <main class="flex-1 p-6">
+
+        <!-- Flash messages container -->
+        <div id="flash-container" class="fixed top-4 right-4 z-50 w-80 space-y-2">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                    <div class="mb-6">
-                        {% for category, message in messages %}
-                            <div class="p-4 mb-2 rounded-md 
-                                {% if category == 'success' %}bg-green-100 text-green-800
-                                {% elif category == 'error' %}bg-red-100 text-red-800
-                                {% elif category == 'warning' %}bg-yellow-100 text-yellow-800
-                                {% else %}bg-blue-100 text-blue-800{% endif %}">
-                                {{ message }}
+                    {% for category, message in messages %}
+                        {% set bg_color = "bg-blue-100 border-blue-500 text-blue-700" %}
+                        {% set icon = "information-circle" %}
+                        
+                        {% if category == "success" %}
+                            {% set bg_color = "bg-green-100 border-green-500 text-green-700" %}
+                            {% set icon = "check-circle" %}
+                        {% elif category == "error" %}
+                            {% set bg_color = "bg-red-100 border-red-500 text-red-700" %}
+                            {% set icon = "x-circle" %}
+                        {% elif category == "warning" %}
+                            {% set bg_color = "bg-yellow-100 border-yellow-500 text-yellow-700" %}
+                            {% set icon = "exclamation" %}
+                        {% endif %}
+                        
+                        <div class="flash-message border-l-4 p-4 rounded shadow-md {{ bg_color }}" role="alert">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        {% if icon == "check-circle" %}
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                        {% elif icon == "x-circle" %}
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                        {% elif icon == "exclamation" %}
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                        {% else %}
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                        {% endif %}
+                                    </svg>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <p class="text-sm">{{ message }}</p>
+                                </div>
+                                <div class="ml-auto pl-3">
+                                    <div class="-mx-1.5 -my-1.5">
+                                        <button class="close-flash inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2 {{ bg_color }}">
+                                            <span class="sr-only">Dismiss</span>
+                                            <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        {% endfor %}
-                    </div>
+                        </div>
+                    {% endfor %}
                 {% endif %}
             {% endwith %}
-            
+        </div>
+        
+        <main class="flex-1 p-6">
             {% block content %}{% endblock %}
         </main>
     </div>
@@ -42,6 +120,37 @@
             </p>
         </div>
     </footer>
+
+    <!-- Flash message auto-close script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all flash messages
+            const flashMessages = document.querySelectorAll('.flash-message');
+            
+            // Add click event listener to close buttons
+            document.querySelectorAll('.close-flash').forEach(button => {
+                button.addEventListener('click', function() {
+                    const flashMessage = this.closest('.flash-message');
+                    closeFlashMessage(flashMessage);
+                });
+            });
+            
+            // Auto-close flash messages after 5 seconds
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    closeFlashMessage(message);
+                }, 5000);
+            });
+            
+            // Function to close a flash message with animation
+            function closeFlashMessage(message) {
+                message.classList.add('fade-out');
+                setTimeout(() => {
+                    message.remove();
+                }, 500); // Wait for the animation to complete
+            }
+        });
+    </script>
     
     {% block scripts %}{% endblock %}
 </body>

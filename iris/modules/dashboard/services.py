@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from iris.modules.product_ideas.models import ProductIdea
+from iris.modules.product_ideas.models import ProductIdea, ProductIdeaStatus
 from iris.extensions import db
 
 
@@ -36,8 +36,8 @@ class DashboardService:
             'total_count': total_count,
             'status_counts': status_dict,
             'impact_counts': impact_dict,
-            'approved_count': status_dict.get('approved', 0),
-            'draft_count': status_dict.get('draft', 0),
+            'approved_count': status_dict.get(ProductIdeaStatus.APPROVED, 0),
+            'draft_count': status_dict.get(ProductIdeaStatus.DRAFT, 0),
             'high_impact_count': impact_dict.get('high', 0)
         }
     
