@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlalchemy.sql import func
 from iris.extensions import db
 import json
+import uuid
 
 
 # String constants for Epic status
@@ -71,12 +72,18 @@ class Epic(db.Model):
     
     @property
     def completion_percentage(self):
-        """Calculate completion percentage based on user stories."""
-        if not self.user_stories:
+        """Calculate the completion percentage of the epic based on its status."""
+        if self.status == EpicStatus.COMPLETED:
+            return 100
+        elif self.status == EpicStatus.CANCELLED:
             return 0
-        
-        completed = sum(1 for story in self.user_stories if story.status == 'completed')
-        return int((completed / len(self.user_stories)) * 100)
+        elif self.status == EpicStatus.IN_PROGRESS:
+            return 50
+        elif self.status == EpicStatus.PLANNED:
+            return 25
+        elif self.status == EpicStatus.DRAFT:
+            return 0
+        return 0
     
     @property
     def days_until_target(self):
