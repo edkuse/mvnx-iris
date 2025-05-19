@@ -1,0 +1,52 @@
+<div class="hidden md:flex md:flex-shrink-0">
+    <div class="flex flex-col w-64">
+        <div class="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
+            <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+                <div class="flex items-center flex-shrink-0 px-4">
+                    <span class="text-lg font-semibold text-gray-900">Navigation</span>
+                </div>
+                <nav class="mt-5 flex-1 px-2 bg-white space-y-1">
+                    <a href="{{ url_for('dashboard.index') }}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {% if request.endpoint == 'dashboard.index' %}bg-indigo-100 text-indigo-900{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+                        <svg class="mr-3 h-6 w-6 {% if request.endpoint == 'dashboard.index' %}text-indigo-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Dashboard
+                    </a>
+                    
+                    <a href="{{ url_for('product_ideas.index') }}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {% if request.endpoint.startswith('product_ideas.') %}bg-indigo-100 text-indigo-900{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+                        <svg class="mr-3 h-6 w-6 {% if request.endpoint.startswith('product_ideas.') %}text-indigo-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        Product Ideas
+                    </a>
+                    
+                    {# {% if current_user.has_role('admin') %} #}
+                    <a href="{{ url_for('auth.profile') }}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {% if request.endpoint.startswith('auth.') and request.endpoint != 'auth.login' %}bg-indigo-100 text-indigo-900{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+                        <svg class="mr-3 h-6 w-6 {% if request.endpoint.startswith('auth.') and request.endpoint != 'auth.login' %}text-indigo-500{% else %}text-gray-400 group-hover:text-gray-500{% endif %}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        User Management
+                    </a>
+                    {# {% endif %} #}
+                </nav>
+            </div>
+            <div class="flex-shrink-0 flex border-t border-gray-200 p-4">
+                <div class="flex-shrink-0 w-full group block">
+                    <div class="flex items-center">
+                        <div>
+                            <img class="inline-block h-9 w-9 rounded-full" src="{{ current_user.profile_picture or '/static/images/default-avatar.jpg' }}" alt="{{ current_user.display_name }}">
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                                {{ current_user.display_name }}
+                            </p>
+                            <p class="text-xs font-medium text-gray-500 group-hover:text-gray-700">
+                                {{ current_user.email }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

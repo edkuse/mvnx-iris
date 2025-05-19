@@ -1,0 +1,217 @@
+{% extends "product_ideas/layout.html" %}
+
+{% block product_ideas_title %}{{ 'Edit' if idea else 'Create' }} Product Idea{% endblock %}
+{% block product_ideas_subtitle %}{{ 'Update the details of an existing idea' if idea else 'Submit a new product idea' }}{% endblock %}
+
+{% block product_ideas_actions %}
+{% if idea %}
+<div>
+    <a href="{{ url_for('product_ideas.view', id=idea.id) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Idea
+    </a>
+</div>
+{% else %}
+<div>
+    <a href="{{ url_for('product_ideas.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Ideas
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block product_ideas_content %}
+<div class="p-4 sm:p-6">
+    <form method="post" action="{{ url_for('product_ideas.edit', id=idea.id) if idea else url_for('product_ideas.create') }}" class="space-y-6">
+        {{ csrf_token() }}
+        
+        <!-- Title -->
+        <div>
+            <label for="title" class="block text-sm font-medium text-gray-700">Title <span class="text-red-500">*</span></label>
+            <div class="mt-1">
+                <input type="text" name="title" id="title" required
+                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    value="{{ idea.title if idea else '' }}">
+            </div>
+            {% if form_errors and form_errors.title %}
+            <p class="mt-2 text-sm text-red-600">{{ form_errors.title }}</p>
+            {% endif %}
+        </div>
+        
+        <!-- Description -->
+        <div>
+            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+            <div class="mt-1">
+                <textarea id="description" name="description" rows="5"
+                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">{{ idea.description if idea else '' }}</textarea>
+            </div>
+            {% if form_errors and form_errors.description %}
+            <p class="mt-2 text-sm text-red-600">{{ form_errors.description }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <!-- Status -->
+            <div class="sm:col-span-2">
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <div class="mt-1">
+                    <select id="status" name="status"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        {% for status in statuses %}
+                        <option value="{{ status.name }}" {% if idea and idea.status == status %}selected{% endif %}>
+                            {{ status.value.replace('_', ' ').title() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if form_errors and form_errors.status %}
+                <p class="mt-2 text-sm text-red-600">{{ form_errors.status }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Priority -->
+            <div class="sm:col-span-2">
+                <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
+                <div class="mt-1">
+                    <select id="priority" name="priority"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        {% for priority in priorities %}
+                        <option value="{{ priority.name }}" {% if idea and idea.priority == priority %}selected{% endif %}>
+                            {{ priority.value.title() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if form_errors and form_errors.priority %}
+                <p class="mt-2 text-sm text-red-600">{{ form_errors.priority }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Impact Level -->
+            <div class="sm:col-span-2">
+                <label for="impact_level" class="block text-sm font-medium text-gray-700">Impact Level</label>
+                <div class="mt-1">
+                    <select id="impact_level" name="impact_level"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        {% for impact in impacts %}
+                        <option value="{{ impact.name }}" {% if idea and idea.impact_level == impact %}selected{% endif %}>
+                            {{ impact.value.title() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if form_errors and form_errors.impact_level %}
+                <p class="mt-2 text-sm text-red-600">{{ form_errors.impact_level }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <!-- Assigned To -->
+            <div class="sm:col-span-3">
+                <label for="assigned_to_id" class="block text-sm font-medium text-gray-700">Assigned To</label>
+                <div class="mt-1">
+                    <select id="assigned_to_id" name="assigned_to_id"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        <option value="">Not Assigned</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}" {% if idea and idea.assigned_to_id == user.id %}selected{% endif %}>
+                            {{ user.display_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if form_errors and form_errors.assigned_to_id %}
+                <p class="mt-2 text-sm text-red-600">{{ form_errors.assigned_to_id }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Target Date -->
+            <div class="sm:col-span-3">
+                <label for="target_date" class="block text-sm font-medium text-gray-700">Target Date</label>
+                <div class="mt-1">
+                    <input type="date" name="target_date" id="target_date"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        value="{{ idea.target_date.strftime('%Y-%m-%d') if idea and idea.target_date else '' }}">
+                </div>
+                {% if form_errors and form_errors.target_date %}
+                <p class="mt-2 text-sm text-red-600">{{ form_errors.target_date }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Tags -->
+        <div>
+            <label for="tags" class="block text-sm font-medium text-gray-700">Tags</label>
+            <div class="mt-1">
+                <input type="text" name="tags" id="tags"
+                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    value="{{ ','.join(idea.tags) if idea and idea.tags else '' }}"
+                    placeholder="Enter tags separated by commas">
+            </div>
+            <p class="mt-1 text-xs text-gray-500">Enter tags separated by commas (e.g., feature, ui, performance)</p>
+            {% if form_errors and form_errors.tags %}
+            <p class="mt-2 text-sm text-red-600">{{ form_errors.tags }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <!-- Business Value -->
+            <div class="sm:col-span-3">
+                <label for="business_value" class="block text-sm font-medium text-gray-700">Business Value</label>
+                <div class="mt-1">
+                    <textarea id="business_value" name="business_value" rows="3"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Describe the business value of this idea">{{ idea.business_value if idea else '' }}</textarea>
+                </div>
+                {% if form_errors and form_errors.business_value %}
+                <p class="mt-2 text-sm text-red-600">{{ form_errors.business_value }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Technical Feasibility -->
+            <div class="sm:col-span-3">
+                <label for="technical_feasibility" class="block text-sm font-medium text-gray-700">Technical Feasibility</label>
+                <div class="mt-1">
+                    <textarea id="technical_feasibility" name="technical_feasibility" rows="3"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Describe the technical feasibility of this idea">{{ idea.technical_feasibility if idea else '' }}</textarea>
+                </div>
+                {% if form_errors and form_errors.technical_feasibility %}
+                <p class="mt-2 text-sm text-red-600">{{ form_errors.technical_feasibility }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Estimated Effort -->
+        <div>
+            <label for="estimated_effort" class="block text-sm font-medium text-gray-700">Estimated Effort (hours)</label>
+            <div class="mt-1">
+                <input type="number" name="estimated_effort" id="estimated_effort" min="0"
+                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    value="{{ idea.estimated_effort if idea else '' }}">
+            </div>
+            {% if form_errors and form_errors.estimated_effort %}
+            <p class="mt-2 text-sm text-red-600">{{ form_errors.estimated_effort }}</p>
+            {% endif %}
+        </div>
+        
+        <!-- Submit Buttons -->
+        <div class="flex justify-end">
+            <a href="{{ url_for('product_ideas.view', id=idea.id) if idea else url_for('product_ideas.index') }}" 
+                class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2">
+                Cancel
+            </a>
+            <button type="submit" 
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                {{ 'Update' if idea else 'Create' }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
