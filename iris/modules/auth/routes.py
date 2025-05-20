@@ -54,7 +54,7 @@ def login():
     auth_url = _build_msal_app().get_authorization_request_url(
         current_app.config['MS_SCOPES'],
         state=session["state"],
-        redirect_uri=url_for('auth.authorized', _external=True)
+        redirect_uri='https://mvnx-iris-tool-azg8b6edecfudkbd.westcentralus-01.azurewebsites.net/auth/callback'
     )
     
     return render_template('auth/login.html', auth_url=auth_url)
