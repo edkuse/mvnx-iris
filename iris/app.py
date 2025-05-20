@@ -3,6 +3,7 @@ from iris.config import Config
 from iris.extensions import csrf, db, migrate, login_manager, session
 import os
 
+
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
