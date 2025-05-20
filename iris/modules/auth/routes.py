@@ -78,7 +78,7 @@ def authorized():
     result = cca.acquire_token_by_authorization_code(
         request.args['code'],
         scopes=current_app.config['MS_SCOPES'],
-        redirect_uri=url_for('auth.authorized', _external=True)
+        redirect_uri=current_app.config['REDIRECT_URI']
     )
     
     # Save cache
@@ -86,7 +86,7 @@ def authorized():
     
     if "error" in result:
         flash_error(f"Login failed: {result.get('error_description', 'Unknown error')}")
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('dashboard.index'))
     
     # Get user info
     ms_id = result.get('id_token_claims', {}).get('oid')

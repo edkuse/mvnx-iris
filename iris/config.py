@@ -30,6 +30,10 @@ class Config:
     MS_AUTHORITY = f"https://login.microsoftonline.com/{MS_TENANT_ID}"
     MS_SCOPES = ["User.Read"]
     MS_GRAPH_API = "https://graph.microsoft.com"
+
+    # App configuration
+    APP_URL = os.getenv('APP_URL')
+    REDIRECT_URI = f"{APP_URL}/auth/callback"
     
     # Application settings
     APP_NAME = 'MVNx Iris'
