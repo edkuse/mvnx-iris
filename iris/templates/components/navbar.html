@@ -31,16 +31,18 @@
                             <p class="text-xs text-gray-500">{{ current_user.email }}</p>
                         </div>
                     </div>
-                    
+
                     <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
                         <a href="{{ url_for('auth.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Your Profile</a>
                         <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
                     </div>
                 </div>
-                {% else %}
-                <a href="{{ url_for('auth.login') }}" class="">
-                    <img src="{{url_for('static',filename='images/ms-symbollockup_signin_light.png')}}" alt="Sign in with Microsoft">
-                </a>
+                {#
+                    
+                    <a href="{{ url_for('auth.login') }}" class="">
+                        <img src="{{url_for('static',filename='images/ms-symbollockup_signin_light.png')}}" alt="Sign in with Microsoft">
+                    </a>
+                #}
                 {% endif %}
             </div>
             <div class="-mr-2 flex items-center sm:hidden">
