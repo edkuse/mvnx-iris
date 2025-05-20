@@ -78,7 +78,7 @@ def authorized():
     result = cca.acquire_token_by_authorization_code(
         request.args['code'],
         scopes=current_app.config['MS_SCOPES'],
-        redirect_uri=current_app.config['REDIRECT_URI']
+        redirect_uri='https://mvnx-iris-tool-azg8b6edecfudkbd.westcentralus-01.azurewebsites.net/auth/callback'
     )
     
     # Save cache
